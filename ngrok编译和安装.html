@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="canonical" href="https://blog.csdn.net/wind520/article/details/79015915"/> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="referrer" content="always">
+    <meta name="description" content="1：安装git
+[root@iZuf6h59snssqyqa3ka87eZ home]# yum install git
+
+
+[root@iZuf6h59snssqyqa3ka87eZ home]# yum install git
+Loaded plugins: fastestmirror
+                                                  " />
+    <meta name="keywords" content="动态域名" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+    <title>ngrok编译和安装 - CSDN博客</title>
+            <style>
+            .MathJax, .MathJax_Message, .MathJax_Preview{
+                display: none
+            }
+      </style>
+</head>
+<body>
+        <h1 class="csdn_top">ngrok编译和安装</h1>
+        <div id="article_content" class="article_content csdn-tracking-statistics tracking-click" data-mod="popu_519" data-dsm="post">
+                            <div class="htmledit_views">
+                        
+<p>1：安装git</p>
+<p>[root@iZuf6h59snssqyqa3ka87eZ home]# yum install git<br /></p>
+<p></p>
+<pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ home]# yum install git
+Loaded plugins: fastestmirror
+                                                                                                                                                        5/6 
+  Verifying  : git-1.8.3.1-12.el7_4.x86_64                                                                                                                                                                6/6 
+
+Installed:
+  git.x86_64 0:1.8.3.1-12.el7_4                                                                                                                                                                                
+
+Dependency Installed:
+  libgnome-keyring.x86_64 0:3.12.0-1.el7       perl-Error.noarch 1:0.17020-2.el7       perl-Git.noarch 0:1.8.3.1-12.el7_4       perl-TermReadKey.x86_64 0:2.30-20.el7       rsync.x86_64 0:3.0.9-18.el7      
+
+Complete!</pre>
+2：clone 代码
+<p></p>
+<pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ home]# git clone https://github.com/inconshreveable/ngrok.git ngrok
+Cloning into 'ngrok'...
+remote: Counting objects: 2732, done.
+remote: Total 2732 (delta 0), reused 0 (delta 0), pack-reused 2732
+Receiving objects: 100% (2732/2732), 665.40 KiB | 764.00 KiB/s, done.
+Resolving deltas: 100% (1298/1298), done.</pre>
+3：安装go环境<br /><pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ home]# yum install golang
+Running transaction
+  Installing : golang-src-1.8.3-1.el7.noarch                                                                                                                                                               1/3 
+  Installing : golang-1.8.3-1.el7.x86_64                                                                                                                                                                   2/3 
+  Installing : golang-bin-1.8.3-1.el7.x86_64                                                                                                                                                               3/3 
+  Verifying  : golang-bin-1.8.3-1.el7.x86_64                                                                                                                                                               1/3 
+  Verifying  : golang-src-1.8.3-1.el7.noarch                                                                                                                                                               2/3 
+  Verifying  : golang-1.8.3-1.el7.x86_64                                                                                                                                                                   3/3 
+
+Installed:
+  golang.x86_64 0:1.8.3-1.el7                                                                                                                                                                                  
+
+Dependency Installed:
+  golang-bin.x86_64 0:1.8.3-1.el7                                                                        golang-src.noarch 0:1.8.3-1.el7                                                                       
+
+Complete!</pre>
+4：设置域名<br /><pre class="html">[root@iZuf6h59snssqyqa3ka87eZ home]# cd ngrok
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# export NGROK_DOMAIN="vx.xxx.cn"
+</pre>
+5：配置证书<br /><pre class="hljs objectivec">openssl genrsa -<span class="hljs-keyword">out</span> rootCA.key <span class="hljs-number">2048</span>
+openssl req -x509 -new -nodes -key rootCA.key -subj <span class="hljs-string">"/CN=$NGROK_DOMAIN"</span> -days <span class="hljs-number">5000</span> -<span class="hljs-keyword">out</span> rootCA.pem
+openssl genrsa -<span class="hljs-keyword">out</span> device.key <span class="hljs-number">2048</span>
+openssl req -new -key device.key -subj <span class="hljs-string">"/CN=$NGROK_DOMAIN"</span> -<span class="hljs-keyword">out</span> device.csr
+openssl x509 -req -<span class="hljs-keyword">in</span> device.csr -CA rootCA.pem -<span class="hljs-built_in">CAkey</span> rootCA.key -<span class="hljs-built_in">CAcreateserial</span> -<span class="hljs-keyword">out</span> device.crt -days <span class="hljs-number">5000</span></pre>
+<pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ ngrok]# openssl genrsa -out rootCA.key 2048
+Generating RSA private key, 2048 bit long modulus
+......................................+++
+.......+++
+e is 65537 (0x10001)
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=$NGROK_DOMAIN" -days 5000 -out rootCA.pem
+
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# openssl genrsa -out device.key 2048
+Generating RSA private key, 2048 bit long modulus
+.+++
+.............+++
+e is 65537 (0x10001)
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# openssl req -new -key device.key -subj "/CN=$NGROK_DOMAIN" -out device.csr
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000
+Signature ok
+subject=/CN=vx.xxx.cn
+Getting CA Private Key</pre>
+   复制证书 \cp 覆盖不提示
+<p></p>
+<p></p>
+<pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ ngrok]# \cp rootCA.pem assets/client/tls/ngrokroot.crt
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# \cp device.crt assets/server/tls/snakeoil.crt 
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# \cp device.key assets/server/tls/snakeoil.key</pre>
+6：编译<br /><pre class="plain"> #win服务端
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# GOOS=windows GOARCH=386 make release-server 
+go install -tags 'release' ngrok/main/ngrokd
+ #win客户端
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# GOOS=windows GOARCH=386 make release-client
+go install -tags 'release' ngrok/main/ngrok
+ #linux服务端
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# GOOS=linux GOARCH=386 make release-server
+go install -tags 'release' ngrok/main/ngrokd
+#linux客户端
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# GOOS=linux GOARCH=386 make release-client
+go install -tags 'release' ngrok/main/ngrok</pre>
+7：运行服务端
+<p></p>
+<pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ ngrok]# ./bin/linux_386/ngrokd -domain="vx.xxx.cn" -httpAddr=":80"
+[18:02:40 CST 2018/01/09] [INFO] (ngrok/log.(*PrefixLogger).Info:83) [metrics] Reporting every 30 seconds
+[18:02:40 CST 2018/01/09] [INFO] (ngrok/log.(*PrefixLogger).Info:83) [registry] [tun] No affinity cache specified
+[18:02:40 CST 2018/01/09] [INFO] (ngrok/log.Info:112) Listening for public http connections on [::]:80
+[18:02:40 CST 2018/01/09] [INFO] (ngrok/log.Info:112) Listening for public https connections on [::]:443
+[18:02:40 CST 2018/01/09] [INFO] (ngrok/log.Info:112) Listening for control and proxy connections on [::]:4443</pre>
+8：运行客户端
+<p></p>
+<p>为客户端编写一个配置文件 ngrok.cfg，然后运行：</p>
+<pre class="hljs groovy"><span class="hljs-string">server_addr:</span> <span class="hljs-string">"vx.xxx.cn:4443"</span>
+<span class="hljs-string">trust_host_root_certs:</span> <span class="hljs-literal">false</span></pre>
+<pre class="hljs bash">ngrok -config=./ngrok.cfg -subdomain=<span class="hljs-built_in">test</span> 80</pre>
+  运行结果
+<p></p>
+<pre class="hljs nginx"><span class="hljs-attribute">Tunnel</span> Status                 online
+Version                       <span class="hljs-number">1</span>.<span class="hljs-number">7</span>/<span class="hljs-number">1</span>.<span class="hljs-number">7</span>
+Forwarding                    http://test.vx.xxx.cn -&gt; <span class="hljs-number">127.0.0.1:80</span>
+Forwarding                    https://test.vx.xxx.cn -&gt; <span class="hljs-number">127.0.0.1:80</span>
+Web Interface                 <span class="hljs-number">127.0.0.1:4040</span>
+<span class="hljs-comment"># Conn                        0</span>
+Avg Conn Time                 <span class="hljs-number">0</span>.<span class="hljs-number">00ms</span></pre>
+9：需要把域名
+<p></p>
+<p>vx.xxx.cn</p>
+<p>test.vx.xxx.cn 指向服务器的IP<br />
+10：指定域名</p>
+<p>   客户端启动参数配置即可<br /></p>
+<pre class="hljs bash">ngrok -config=./ngrok.cfg -hostname=<span class="hljs-built_in">test.xxx.cn</span> 80</pre>
+<p>11：配置https</p>
+<p>首先在阿里云申请免费的ssl证书，然后下载证书上传到服务器，解压</p>
+<p></p><pre class="html">[root@iZuf6h59snssqyqa3ka87eZ van]# ls -l
+total 28
+-rw-r--r-- 1 root root 1679 Jan 11 10:08 213976973460777.key
+-rw-r--r-- 1 root root 3292 Jan 11 10:08 213976973460777.pem
+-rw-r--r-- 1 root root 4258 Jan 11 10:08 213976973460777.pfx
+-rw-r--r-- 1 root root 1679 Jan 11 10:08 chain.pem
+-rw-r--r-- 1 root root   15 Jan 11 10:08 pfx-password.txt
+-rw-r--r-- 1 root root 1614 Jan 11 10:08 public.pem</pre>    重新运行服务端：
+<p></p><pre class="plain">[root@iZuf6h59snssqyqa3ka87eZ ngrok]# netstat -lntp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      10742/sshd          
+tcp6       0      0 :::8080                 :::*                    LISTEN      17146/docker-proxy- 
+tcp6       0      0 :::8082                 :::*                    LISTEN      8175/docker-proxy-c 
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# ./bin/linux_386/ngrokd -domain="vx.xxx.cn" -httpAddr=":80"  -tlsKey="./van/213976973460777.key" -tlsCrt="./van/213976973460777.pem" &amp;
+[1] 2586
+[root@iZuf6h59snssqyqa3ka87eZ ngrok]# [15:58:45 CST 2018/01/12] [INFO] (ngrok/log.(*PrefixLogger).Info:83) [registry] [tun] No affinity cache specified
+[15:58:45 CST 2018/01/12] [INFO] (ngrok/log.(*PrefixLogger).Info:83) [metrics] Reporting every 30 seconds
+[15:58:45 CST 2018/01/12] [INFO] (ngrok/log.Info:112) Listening for public http connections on [::]:80
+[15:58:45 CST 2018/01/12] [INFO] (ngrok/log.Info:112) Listening for public https connections on [::]:443
+[15:58:45 CST 2018/01/12] [INFO] (ngrok/log.Info:112) Listening for control and proxy connections on [::]:4443</pre>
+<p>修改客户端配置文件 ngrok.cfg,然后运行，就可以使用htts访问了</p>
+<pre class="hljs groovy"><span class="hljs-string">server_addr:</span> <span class="hljs-string">"vx.xxx.cn:4443"</span>
+<span class="hljs-string">trust_host_root_certs:</span> true</pre>
+<br /><br /><br /><p><br /></p>
+<p></p>
+<p><br /><br /><br /></p>
+                </div>
+                    </div>
+</body>
